@@ -7,6 +7,10 @@ import re
 import sys
 import PyPDF2
 import matplotlib.pyplot as plt
+import db
+from datetime import datetime
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # ----- Data Collection ------
 try:
@@ -59,7 +63,7 @@ try:
     print(grouped_transaction_df)
     
 except FileNotFoundError:
-    print("Error: Insert valid file in the roster folder.")
+    print("Error: Insert valid transaction file in the folder.")
     sys.exit(1)
 except ValueError:
     print("Error: Invalid input. Input the value only, no dollar signs or commas.")
@@ -206,3 +210,28 @@ try:
 
 except Exception as e:
     print(f"PDF Error: {e}")
+
+
+# --- The SQL part ---
+RUN_TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+SEMESTER = input("Enter semester (e.g. Fall2025, Spring2026): ").strip()
+
+print(f"Audit started: {RUN_TIMESTAMP}")
+print(f"Semester: {SEMESTER}")
+
+db.init_db()
+conn = db.get_connection()
+
+transaction_dfs_df['semester'] = SEMESTER
+transaction_dfs_df.to_sql('transactions', conn, if_exists='append', index=False)
+
+treasury_dfs_df['semester'] = SEMESTER
+treasury_dfs_df.to_sql('treasury', conn, if_exists='append', index=False)
+
+conn.execute("""
+    INSERT INTO audit_runs (run_date, semester, headcount, net_balance, net_transactions, cash_flow_delta, hq_fees, dues_per_brother)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+""", (RUN_TIMESTAMP, SEMESTER, headcount, net_balance, net_transactions, cash_flow_delta, hq_fees, dues_per_brother))
+
+conn.commit()
+conn.close()
