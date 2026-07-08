@@ -1,0 +1,5 @@
+Date,Status,Description,Amount,Balance
+SKIPPED_HEADER_ROW,export artifact,none,0,0
+2025-09-04,Completed,Dues payment - member,$375.00,$5375.00
+2025-09-06,Completed,Transfer to gMoney card,-$500.00,$4875.00
+2025-09-15,Completed,Dues payment - member,$375.00,$5250.00

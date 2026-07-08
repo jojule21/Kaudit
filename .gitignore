@@ -1,0 +1,12 @@
+# Real chapter data — never commit
+transactions/*.csv
+treasury/*.csv
+roster/*.csv
+invoices/*.pdf
+*.db
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
